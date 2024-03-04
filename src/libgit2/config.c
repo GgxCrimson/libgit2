@@ -676,7 +676,7 @@ int git_config_delete_entry(git_config *config, const char *name)
 	git_config_backend *backend;
 
 	if ((backend = get_writer(config)) == NULL)
-		return GIT_ENOTFOUND;
+		return GIT_EREADONLY;
 
 	return backend->del(backend, name);
 }
@@ -710,7 +710,7 @@ int git_config_set_string(git_config *config, const char *name, const char *valu
 
 	if ((backend = get_writer(config)) == NULL) {
 		git_error_set(GIT_ERROR_CONFIG, "cannot set '%s': the configuration is read-only", name);
-		return GIT_ENOTFOUND;
+		return GIT_EREADONLY;
 	}
 
 	error = backend->set(backend, name, value);
@@ -1155,7 +1155,7 @@ int git_config_set_multivar(git_config *config, const char *name, const char *re
 
 	if ((backend = get_writer(config)) == NULL) {
 		git_error_set(GIT_ERROR_CONFIG, "cannot set '%s': the configuration is read-only", name);
-		return GIT_ENOTFOUND;
+		return GIT_EREADONLY;
 	}
 
 	return backend->set_multivar(backend, name, regexp, value);
@@ -1166,7 +1166,7 @@ int git_config_delete_multivar(git_config *config, const char *name, const char 
 	git_config_backend *backend;
 
 	if ((backend = get_writer(config)) == NULL)
-		return GIT_ENOTFOUND;
+		return GIT_EREADONLY;
 
 	return backend->del_multivar(backend, name, regexp);
 }
@@ -1322,7 +1322,7 @@ int git_config_lock(git_transaction **out, git_config *config)
 
 	if ((backend = get_writer(config)) == NULL) {
 		git_error_set(GIT_ERROR_CONFIG, "cannot lock: the configuration is read-only");
-		return GIT_ENOTFOUND;
+		return GIT_EREADONLY;
 	}
 
 	if ((error = backend->lock(backend)) < 0)
@@ -1339,7 +1339,7 @@ int git_config_unlock(git_config *config, int commit)
 
 	if ((backend = get_writer(config)) == NULL) {
 		git_error_set(GIT_ERROR_CONFIG, "cannot unlock: the configuration is read-only");
-		return GIT_ENOTFOUND;
+		return GIT_EREADONLY;
 	}
 
 	return backend->unlock(backend, commit);
